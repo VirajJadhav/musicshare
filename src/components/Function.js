@@ -24,3 +24,13 @@ export const login = (User) => {
     })
     .catch(error => console.log(error.message))
 }
+
+export const upload = (User) => {
+    return axios.post("users/upload", {
+        email: User.email
+    })
+    .then(response => {
+        return response.data
+    })
+    .catch(error => console.log(error.message))
+}

@@ -26,7 +26,7 @@ def register():
     password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
     created = datetime.utcnow()
 
-    user_id = users.insert({
+    user_id = users.insert_one({
         'first_name': first_name,
         'last_name': last_name,
         'email': email,
@@ -62,6 +62,23 @@ def login():
 	else:
 		result = jsonify({ 'result': "No Results found", 'error': True })
 	return result
+
+@app.route('/users/upload', methods=['POST'])
+def upload():
+	if 'audio_file' in request.files:
+		audio_file = request.files['audio_file']
+		# email = request.get_json()['email']
+		email = "viraj@gmail.com"
+		mongo.save_file(audio_file.filename, audio_file)
+		mongo.db.audio.insert_one({ 'email': email, 'audio_file_name': audio_file.filename })
+		return jsonify({ 'audio_file': True })
+	else:
+		return jsonify({ 'audio_file': False })
+
+@app.route('/users/getAudio/<email>')
+def showAudio(email):
+	user = mongo.db.audio.find_one_or_404({ 'email': email })
+	return mongo.send_file(user['audio_file_name'])
 
 if __name__ == "__main__":
 	app.run(debug=True)

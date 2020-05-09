@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import jwt_decode from "jwt-decode"
+import {upload} from "./Function.js"
 
 class UserProfile extends Component {
     constructor(props) {
@@ -8,16 +9,28 @@ class UserProfile extends Component {
             first_name: "",
             last_name: "",
             email: "",
-        }
+	    }
     }
     componentDidMount() {
-        const token = localStorage.usertoken
-        const decoded = jwt_decode(token)
+        const decoded = jwt_decode(localStorage.usertoken)
         this.setState({
             first_name: decoded.identity.first_name,
             last_name: decoded.identity.last_name,
             email: decoded.identity.email
         })
+    }
+    onSubmit = (event) => {
+        event.preventDefault();
+        const User = {
+            email: this.state.email
+        }
+        upload(User).then(res => {
+            if(res.audio_file) {
+                // this.props.history.push('/profile')
+                console.log("reached");
+            }
+        })
+        .catch(error => console.log(error.messgae))
     }
     render() {
         return (
@@ -28,22 +41,10 @@ class UserProfile extends Component {
                             Profile
                         </h1>
                     </div>
-                    <table className="table col-md-6 mx-auto">
-                        <tbody>
-                            <tr>
-                                <td>First Name</td>
-        <td>{this.state.first_name}</td>
-                            </tr>
-                            <tr>
-                              <td>Last Name</td>
-        <td>{this.state.last_name}</td>
-                            </tr>
-                            <tr>
-                                <td>Email</td>
-        <td>{this.state.email}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <form method="POST" noValidate onSubmit={this.onSubmit} encType="multipart/form-data">
+				        <input type="file" name="audio_file" />
+                        <button type="submit">Submit</button>
+                    </form>
                 </div>
             </div>
         )

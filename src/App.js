@@ -10,17 +10,15 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <Switch>
         <div>
           <NavBar />
-          <Route exact path="/" component={Landing} />
-          <div className="container">
+          <Switch>
+            <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/register" component={Register} />
             <Route exact path="/profile" component={UserProfile} />
-          </div>
+          </Switch>
         </div>
-      </Switch>
     </Router>
   );
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Link, withRouter } from "react-router-dom"
+import { withRouter } from "react-router-dom"
+import { Navbar, Nav } from "react-bootstrap"
 
 class NavBar extends Component {
     logOut = (event) => {
@@ -9,49 +10,27 @@ class NavBar extends Component {
     }
     render() {
         const loginRegLink = (
-            <ul className="navbar-nav">
-                <li className="nav-item">
-                    <Link to="/login" className="nav-link">Login</Link>
-                </li>
-                <li className="nav-item">
-                    <Link to="/register" className="nav-link">Register</Link>
-                </li>
-            </ul>
+            <Nav className="ml-auto">
+                <Nav.Link href="/">Home</Nav.Link>
+                <Nav.Link href="/login">User</Nav.Link>
+                <Nav.Link href="/register">Register</Nav.Link>
+            </Nav>
         )
         const userLink = (
-            <ul className="navbar-nav">
-                <li className="nav-item">
-                    <Link to="/profile" className="nav-link">User</Link>
-                </li>
-                <li className="nav-item">
-                    <a href="#" onClick={this.logOut} className="nav-link">Log Out</a>
-                    {/* <Link to="/register" className="nav-link">Register</Link> */}
-                </li>
-            </ul>
+            <Nav className="ml-auto">
+                <Nav.Link href="/">Home</Nav.Link>
+                <Nav.Link href="/profile">User</Nav.Link>
+                <Nav.Link href="#logout" onClick={this.logOut}>Log Out</Nav.Link>
+            </Nav>
         )
         return (
-            <nav className="navbar navbar-expang-lg navbar-dark bg-dark rounded">
-                <button className="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbar1"
-                aria-controls="navbar1"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-                >
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse justify-content-center"
-                id="navbar1"
-                >
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link to="/" className="nav-link">Home</Link>
-                        </li>
-                    </ul>
+            <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
+                <Navbar.Brand href="/">Music Share</Navbar.Brand>
+                <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                <Navbar.Collapse id="responsive-navbar-nav">
                     {localStorage.usertoken ? userLink : loginRegLink}
-                </div> 
-            </nav>
+                </Navbar.Collapse>
+            </Navbar>
         )
     }
 }
