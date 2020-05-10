@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, json
+from flask import Flask, jsonify, request, json, url_for, redirect
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
@@ -42,12 +42,12 @@ def register():
 
 @app.route('/users/login', methods=['POST'])
 def login():
-	uesrs = mongo.db.users
+	users = mongo.db.users
 	email = request.get_json()['email']
 	password = request.get_json()['password']
 	result = ""
 
-	response = uesrs.find_one({ 'email': email })
+	response = users.find_one({ 'email': email })
 
 	if response:
 		if bcrypt.check_password_hash(response['password'], password):
@@ -67,18 +67,18 @@ def login():
 def upload():
 	if 'audio_file' in request.files:
 		audio_file = request.files['audio_file']
-		# email = request.get_json()['email']
-		email = "viraj@gmail.com"
-		mongo.save_file(audio_file.filename, audio_file)
-		mongo.db.audio.insert_one({ 'email': email, 'audio_file_name': audio_file.filename })
+		email = request.headers['email']
+		# mongo.save_file(audio_file.filename, audio_file)
+		# mongo.db.audio.insert_one({ 'email': email, 'audio_file_name': audio_file.filename })
 		return jsonify({ 'audio_file': True })
 	else:
 		return jsonify({ 'audio_file': False })
 
-@app.route('/users/getAudio/<email>')
+@app.route('/users/getAudio/<email>', methods=['GET'])
 def showAudio(email):
 	user = mongo.db.audio.find_one_or_404({ 'email': email })
-	return mongo.send_file(user['audio_file_name'])
+	#mongo.sensd_file(user['audio_file_name'])
+	return True
 
 if __name__ == "__main__":
 	app.run(debug=True)

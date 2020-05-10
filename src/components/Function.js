@@ -26,8 +26,11 @@ export const login = (User) => {
 }
 
 export const upload = (User) => {
-    return axios.post("users/upload", {
-        email: User.email
+    return axios.post('users/upload', User.audio_file, {
+        headers: {
+            'Content-Type': "multipart/form-data",
+            'email': User.email
+        },
     })
     .then(response => {
         return response.data
