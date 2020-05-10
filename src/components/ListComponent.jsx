@@ -48,7 +48,7 @@ const ExpansionPanelDetails = withStyles((theme) => ({
 }))(MuiExpansionPanelDetails);
 
 export default function ListComponent(props) {
-  const [expanded, setExpanded] = React.useState('panel1');
+  const [expanded, setExpanded] = React.useState('panel0');
 
   var index = 0;
 
@@ -57,18 +57,17 @@ export default function ListComponent(props) {
   };
 
   const showSongs = () => (
-          <ExpansionPanel key={index} square expanded={expanded === 'panel' + props.data[index]} onChange={handleChange('panel' + props.data[index])}>
-            <ExpansionPanelSummary aria-controls="panel1d-content" id="panel1d-header">
-  <Typography>Collapsible Group Item {props.data[index++]}</Typography>
+          <ExpansionPanel key={index} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
+            <ExpansionPanelSummary aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
+  <Typography>{props.data[index]}</Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
-                <CardComponent />
+                <CardComponent index={index++} email={props.email} data={props.data} />
             </ExpansionPanelDetails>
         </ExpansionPanel>
   )
-
   return (
-    <div>
+    <div className="mb-4">
         {props.data.map(() => showSongs())}
     </div>
   );

@@ -6,7 +6,7 @@ class Landing extends Component {
         return (
             <MDBContainer>
                 <MDBJumbotron className="mt-5">
-                    <MDBCol sm={8} className="mx-auto">
+                    <MDBCol sm="8" className="mx-auto">
                         <h1 className="text-center">Welcome</h1>
                     </MDBCol>
                 </MDBJumbotron>

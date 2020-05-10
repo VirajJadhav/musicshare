@@ -1,11 +1,10 @@
 import React from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Card, CardContent, CardMedia, IconButton, Typography } from "@material-ui/core"
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
-import PauseCircleFilledRounded from "@material-ui/icons/PauseCircleFilledRounded"
-// import test from "./test.mp3"
+// import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
+// import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+// import SkipNextIcon from '@material-ui/icons/SkipNext';
+// import PauseCircleFilledRounded from "@material-ui/icons/PauseCircleFilledRounded"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +18,10 @@ const useStyles = makeStyles((theme) => ({
     flex: '1 0 auto',
   },
   cover: {
-    width: 151,
+    width: 140,
+    height: 0,
+    paddingTop: '32%',
+    marginTop:'10'
   },
   controls: {
     display: 'flex',
@@ -36,15 +38,16 @@ const useStyles = makeStyles((theme) => ({
 export default function CardComponent(props) {
   const classes = useStyles();
   const theme = useTheme();
+  const url = '/users/getAllAudio/' + props.email + "/" + props.data[props.index]
   return (
     <Card className={classes.root}>
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <Typography component="h5" variant="h5">
-            Live From Space
+  {props.data[props.index]}
           </Typography>
           <Typography variant="subtitle1" color="textSecondary">
-            Mac Miller
+            - -
           </Typography>
         </CardContent>
         {/* <div className={classes.controls}>
@@ -55,15 +58,14 @@ export default function CardComponent(props) {
             {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
           </IconButton>
         </div> */}
-        <audio src="" controls id="music" />
+        <audio src={url} controls id="music" />
       </div>
       
-      {/* <CardMedia
+      <CardMedia
         className={classes.cover}
         title="Music"
-        image
-        src="../music.png"
-      /> */}
+        image={require('../music.png')}
+      />
     </Card>
   );
 }

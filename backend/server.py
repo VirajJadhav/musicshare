@@ -74,11 +74,29 @@ def upload():
 	else:
 		return jsonify({ 'audio_file': False })
 
+#currently not used anywhere
 @app.route('/users/getAudio/<email>', methods=['GET'])
 def showAudio(email):
 	user = mongo.db.audio.find_one_or_404({ 'email': email })
-	#mongo.sensd_file(user['audio_file_name'])
-	return True
+	return mongo.send_file(user['audio_file_name'])
+
+@app.route('/users/getAudioName/', methods=['POST'])
+def showAudioName():
+	user = list()
+	data = dict()
+	iterable = mongo.db.audio.find({ 'email': request.get_json()['email'] })
+	for doc in iterable:
+		user.append(doc['audio_file_name'])
+	data['songName'] = user
+	return data
+
+@app.route('/users/getAllAudio/<email>/<name>')
+def show(email, name):
+	iterable = mongo.db.audio.find({ 'email': email })
+	for doc in iterable:
+		if name == doc['audio_file_name']:
+			return mongo.send_file(name)
+	return ""
 
 if __name__ == "__main__":
 	app.run(debug=True)

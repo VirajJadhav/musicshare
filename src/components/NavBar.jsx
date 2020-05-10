@@ -24,7 +24,7 @@ class NavBar extends Component {
             </Nav>
         )
         return (
-            <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
+            <Navbar sticky="top" collapseOnSelect expand="md" bg="dark" variant="dark">
                 <Navbar.Brand href="/">Music Share</Navbar.Brand>
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
