@@ -29,9 +29,18 @@ export const upload = (User) => {
     return axios.post('users/upload', User.audio_file, {
         headers: {
             'Content-Type': "multipart/form-data",
-            'email': User.email
+            'email': User.email,
+            'status': User.status
         },
     })
+    .then(response => {
+        return response.data
+    })
+    .catch(error => console.log(error.message))
+}
+
+export const updateStatus = (User) => {
+    return axios.post('users/updateStatus/', User)
     .then(response => {
         return response.data
     })

@@ -38,13 +38,13 @@ const useStyles = makeStyles((theme) => ({
 export default function CardComponent(props) {
   const classes = useStyles();
   const theme = useTheme();
-  const url = '/users/getAllAudio/' + props.email + "/" + props.data[props.index]
+  const url = '/users/getAllAudio/' + props.email + "/" + props.songName[props.index]
   return (
     <Card className={classes.root}>
       <div className={classes.details}>
         <CardContent className={classes.content}>
           <Typography component="h5" variant="h5">
-  {props.data[props.index]}
+  {props.songName[props.index]}
           </Typography>
           <Typography variant="subtitle1" color="textSecondary">
             - -
@@ -64,7 +64,7 @@ export default function CardComponent(props) {
       <CardMedia
         className={classes.cover}
         title="Music"
-        image={require('../music.png')}
+        image={require('../../music.png')}
       />
     </Card>
   );

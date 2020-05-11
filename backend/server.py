@@ -17,6 +17,12 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
 
+#currently not used anywhere
+@app.route('/users/getAudio/<email>', methods=['GET'])
+def showAudio(email):
+	user = mongo.db.audio.find_one_or_404({ 'email': email })
+	return mongo.send_file(user['audio_file_name'])
+
 @app.route('/users/register', methods=['POST'])
 def register():
 	users = mongo.db.users
@@ -62,27 +68,44 @@ def upload():
 	if 'audio_file' in request.files:
 		audio_file = request.files['audio_file']
 		email = request.headers['email']
-		# mongo.save_file(audio_file.filename, audio_file)
-		# mongo.db.audio.insert_one({ 'email': email, 'audio_file_name': audio_file.filename })
-		return jsonify({ 'audio_file': True })
+		status = request.headers['status']
+		response = mongo.db.audio.find_one({ 'audio_file_name': audio_file.filename })
+		if(response):
+			return jsonify({ 'result': "Audio is already Present", 'error': True })
+		else:
+			mongo.save_file(audio_file.filename, audio_file)
+			mongo.db.audio.insert_one({ 'email': email, 'audio_file_name': audio_file.filename, 'status': status })
+			return jsonify({ 'result': "Audio Saved", 'error': False })
 	else:
-		return jsonify({ 'audio_file': False })
-
-#currently not used anywhere
-@app.route('/users/getAudio/<email>', methods=['GET'])
-def showAudio(email):
-	user = mongo.db.audio.find_one_or_404({ 'email': email })
-	return mongo.send_file(user['audio_file_name'])
+		return jsonify({ 'result': "Failed to save Audio.", 'error': True })
 
 @app.route('/users/getAudioName/', methods=['POST'])
 def showAudioName():
 	user = list()
+	userStatus = list()
 	data = dict()
 	iterable = mongo.db.audio.find({ 'email': request.get_json()['email'] })
 	for doc in iterable:
 		user.append(doc['audio_file_name'])
+		userStatus.append(doc['status'])
 	data['songName'] = user
+	data['songStatus'] = userStatus
 	return data
+
+@app.route('/users/updateStatus/', methods=['POST'])
+def updateStatus():
+	email = request.get_json()['email']
+	name = request.get_json()['name']
+	status = request.get_json()['status']
+	user = {}
+	if(status == "Private"):
+		user = { 'email': email, 'audio_file_name': name, 'status': status }
+		mongo.db.audio.update_one(user, { '$set': { 'email': email, 'audio_file_name': name, 'status': "Public" }})
+		return jsonify({ 'result': True, "value": "Public" })
+	elif(status == "Public"): 
+		user = { 'email': email, 'audio_file_name': name, 'status': status }
+		mongo.db.audio.update_one(user, { '$set': { 'email': email, 'audio_file_name': name, 'status': "Private" }})
+		return jsonify({ 'result': True, "value": "Private" })
 
 @app.route('/users/getAllAudio/<email>/<name>')
 def show(email, name):

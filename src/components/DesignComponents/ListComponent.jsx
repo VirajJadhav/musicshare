@@ -4,11 +4,13 @@ import MuiExpansionPanel from '@material-ui/core/ExpansionPanel';
 import MuiExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import MuiExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import Typography from '@material-ui/core/Typography';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CardComponent from "./CardComponent"
+import RadioComponent from "./RadioComponent"
 
 const ExpansionPanel = withStyles({
   root: {
-    border: '1px solid rgba(0, 0, 0, .125)',
+    border: '3px solid rgba(0, 0, 0, 0.125)',
     boxShadow: 'none',
     '&:not(:last-child)': {
       borderBottom: 0,
@@ -43,12 +45,12 @@ const ExpansionPanelSummary = withStyles({
 
 const ExpansionPanelDetails = withStyles((theme) => ({
   root: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(3),
   },
 }))(MuiExpansionPanelDetails);
 
 export default function ListComponent(props) {
-  const [expanded, setExpanded] = React.useState('panel0');
+  const [expanded, setExpanded] = React.useState('panel');
 
   var index = 0;
 
@@ -57,18 +59,21 @@ export default function ListComponent(props) {
   };
 
   const showSongs = () => (
-          <ExpansionPanel key={index} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
-            <ExpansionPanelSummary aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
-  <Typography>{props.data[index]}</Typography>
+          <ExpansionPanel key={index} TransitionProps={{ unmountOnExit: true }} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
+  <Typography>{props.songName[index]}</Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
-                <CardComponent index={index++} email={props.email} data={props.data} />
+                <CardComponent index={index} email={props.email} songName={props.songName} />
             </ExpansionPanelDetails>
+            <div className="text-center mb-2">
+              <RadioComponent history={props.history} email={props.email} songName={props.songName[index]} songStatus={props.songStatus[index++]} />
+            </div>
         </ExpansionPanel>
   )
   return (
     <div className="mb-4">
-        {props.data.map(() => showSongs())}
+        {props.songName.map(() => showSongs())}
     </div>
   );
 }

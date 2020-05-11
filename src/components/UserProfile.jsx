@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import jwt_decode from "jwt-decode"
 import {upload} from "./Function.js"
-import { MDBCol, MDBContainer } from "mdbreact"
-import ListComponent from "./ListComponent"
+import { MDBCol, MDBContainer, MDBRow } from "mdbreact"
+import ListComponent from "./DesignComponents/ListComponent"
 import axios from "axios"
+import { Button } from "react-bootstrap"
+import { Input } from '@material-ui/core'
 
 class UserProfile extends Component {
     constructor(props) {
@@ -13,7 +15,9 @@ class UserProfile extends Component {
             last_name: "",
             email: "",
             file: null,
-            data: []
+            songName: [],
+            songStatus: [],
+            fileValue: ""
 	    }
     }
     async componentDidMount() {
@@ -26,24 +30,33 @@ class UserProfile extends Component {
         await axios.post('users/getAudioName/', {email: decoded.identity.email})
             .then(res => {
                 this.setState({
-                    data: res.data.songName
+                    songName: res.data.songName,
+                    songStatus: res.data.songStatus
                 })
             })
             .catch(error => console.log(error.message))
     }
     onChange = (event) => {
         this.setState({
-            file: event.target.files[0]
+            file: event.target.files[0],
+            fileValue: event.target.files[0].name
         })
+    }
+    handleFile = () => {
+        const check = document.getElementById('music')
+        check.click();
     }
     onSubmit = (event) => {
         event.preventDefault();
         const formData = new FormData()
         formData.append('audio_file', this.state.file)
-        const User = { email: this.state.email, audio_file: formData }
+        const User = { email: this.state.email, audio_file: formData, status: "Private" }
         upload(User).then(res => {
-            if(res.audio_file) {
+            if(!res.error) {
                 window.location.reload();
+            }
+            else if(res.error) {
+                alert(res.result)
             }
         })
         .catch(error => console.log(error.messgae))
@@ -52,16 +65,30 @@ class UserProfile extends Component {
         return (
             <div className="mt-4">
             <h1 className="text-center">
-{this.state.first_name + " " + this.state.last_name}
+                Welcome,
+{" " + this.state.first_name}
             </h1>
+            {/* <h1>Your Songs</h1> */}
             <MDBContainer >
+                <MDBRow>
                 <MDBCol sm="6">
-            <input type="file" multiple onChange={this.onChange} name="audio_file" />
-            <button onClick={this.onSubmit} type="submit">Submit</button>
+                    <MDBRow>
+                        <Button onClick={this.handleFile} variant="outline-primary">Select Music</Button>
+                        <Input value={this.state.fileValue} />
+                    </MDBRow>
+                    <MDBRow>
+                        <input type="file" onChange={this.onChange} hidden id="music" name="audio_file" />
+                        <Button onClick={this.onSubmit} type="submit">Upload Music</Button>
+                    </MDBRow>
                 </MDBCol>
                 <MDBCol md="6">
-                    <ListComponent email={this.state.email} data={this.state.data} />
+                    <MDBCol className="d-flex justify-content-between" md="12">
+                        <Button variant="info">Private Songs</Button>
+                        <Button variant="secondary">Public Songs</Button>
+                    </MDBCol>
+                    <ListComponent history={this.props.history} email={this.state.email} songName={this.state.songName} songStatus={this.state.songStatus} />
                 </MDBCol>
+                </MDBRow>
             </MDBContainer>
             </div>
         )
