@@ -19,36 +19,31 @@ CORS(app)
 
 @app.route('/users/register', methods=['POST'])
 def register():
-    users = mongo.db.users
-    first_name = request.get_json()['first_name']
-    last_name = request.get_json()['last_name']
-    email = request.get_json()['email']
-    password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
-    created = datetime.utcnow()
-
-    user_id = users.insert_one({
-        'first_name': first_name,
-        'last_name': last_name,
-        'email': email,
-        'password': password,
-        'created': created
-    })
-
-    new_user = users.find_one({ '_id': user_id })
-
-    result = { 'email': new_user['email'] + ' registered' }
-
-    return jsonify({ 'result': result })
+	users = mongo.db.users
+	first_name = request.get_json()['first_name']
+	last_name = request.get_json()['last_name']
+	email = request.get_json()['email']
+	password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
+	created = datetime.utcnow()
+	result = users.find_one({ 'email': email })
+	if(result):
+		return jsonify({ 'result': "User with email already registered !", 'error': True })
+	else:
+		newUser = users.insert_one({
+			'first_name': first_name,
+			'last_name': last_name,
+			'email': email,
+			'password': password,
+			'created': created
+		})
+		return jsonify({ 'result': "User Registered", 'error': False })
 
 @app.route('/users/login', methods=['POST'])
 def login():
 	users = mongo.db.users
 	email = request.get_json()['email']
 	password = request.get_json()['password']
-	result = ""
-
 	response = users.find_one({ 'email': email })
-
 	if response:
 		if bcrypt.check_password_hash(response['password'], password):
 			access_token = create_access_token(identity = {
@@ -56,12 +51,11 @@ def login():
 				'last_name': response['last_name'],
 				'email': response['email']
 			})
-			result = jsonify({ 'token': access_token, 'error': False })
+			return jsonify({ 'result': access_token, 'error': False })
 		else:
-			result = jsonify({ 'error': "Invalid username and password" })
+			return jsonify({ 'result': "Invalid password", 'error': True })
 	else:
-		result = jsonify({ 'result': "No Results found", 'error': True })
-	return result
+		return jsonify({ 'result': "Email not registered !", 'error': True })
 
 @app.route('/users/upload', methods=['POST'])
 def upload():
