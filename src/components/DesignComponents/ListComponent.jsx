@@ -63,7 +63,7 @@ export default function ListComponent(props) {
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
   <Typography>{props.songName[index]}</Typography>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+            <ExpansionPanelDetails className="d-flex justify-content-center">
                 <CardComponent index={index} email={props.email} songName={props.songName} />
             </ExpansionPanelDetails>
             <div className="text-center mb-2">
