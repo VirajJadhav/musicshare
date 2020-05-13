@@ -5,7 +5,8 @@ export const register = (User) => {
         first_name: User.first_name,
         last_name: User.last_name,
         email: User.email,
-        password: User.password
+        password: User.password,
+        friends: [],
     })
     .then(response => {
         return response.data

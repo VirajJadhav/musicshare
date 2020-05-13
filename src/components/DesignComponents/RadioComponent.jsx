@@ -1,14 +1,24 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import { green } from '@material-ui/core/colors';
+import { blue, pink } from '@material-ui/core/colors';
 import Radio from '@material-ui/core/Radio';
 import {updateStatus} from "../Function"
 
 const GreenRadio = withStyles({
   root: {
-    color: green[400],
+    color: blue[400],
     '&$checked': {
-      color: green[600],
+      color: blue[600],
+    },
+  },
+  checked: {},
+})((props) => <Radio color="default" {...props} />);
+
+const PinkRadio = withStyles({
+  root: {
+    color: pink[400],
+    '&$checked': {
+      color: pink[600],
     },
   },
   checked: {},
@@ -42,7 +52,7 @@ export default function RadioComponent(props) {
             name="Private"
             inputProps={{ 'aria-label': 'Private' }}
         />Private
-        <Radio
+        <PinkRadio
             checked={selectedValue === 'Public'}
             onChange={handleChange}
             value="Public"

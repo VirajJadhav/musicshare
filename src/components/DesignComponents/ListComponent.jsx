@@ -10,7 +10,7 @@ import RadioComponent from "./RadioComponent"
 
 const ExpansionPanel = withStyles({
   root: {
-    border: '3px solid rgba(0, 0, 0, 0.125)',
+    border: '2px solid white',
     boxShadow: 'none',
     '&:not(:last-child)': {
       borderBottom: 0,
@@ -59,11 +59,11 @@ export default function ListComponent(props) {
   };
 
   const showSongs = () => (
-          <ExpansionPanel key={index} TransitionProps={{ unmountOnExit: true }} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
-            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />} aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
+          <ExpansionPanel style={{ backgroundColor: '#3b4d61', color: 'white' }} key={index} TransitionProps={{ unmountOnExit: true }} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
+            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon color="error" fontSize="large" />} aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
   <Typography>{props.songName[index]}</Typography>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails className="d-flex justify-content-center">
+            <ExpansionPanelDetails style={{ backgroundColor: '#ced7d8' }} className="d-flex justify-content-center">
                 <CardComponent index={index} email={props.email} songName={props.songName} />
             </ExpansionPanelDetails>
             <div className="text-center mb-2">

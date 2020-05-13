@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import jwt_decode from "jwt-decode"
 import {upload} from "./Function.js"
-import { MDBCol, MDBContainer, MDBRow } from "mdbreact"
+import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBIcon, MDBBtn, MDBCardTitle } from "mdbreact"
 import ListComponent from "./DesignComponents/ListComponent"
 import axios from "axios"
 import { Button } from "react-bootstrap"
 import { Input } from '@material-ui/core'
 import SweetAlert from "react-bootstrap-sweetalert";
+import { Link } from 'react-router-dom'
 
 class UserProfile extends Component {
     constructor(props) {
@@ -18,10 +19,12 @@ class UserProfile extends Component {
             first_name: "",
             last_name: "",
             email: "",
+            friends: [],
             file: null,
             songName: [],
             songStatus: [],
-            fileValue: ""
+            fileValue: "",
+            hiddenFields: true,
 	    }
     }
     async componentDidMount() {
@@ -29,7 +32,7 @@ class UserProfile extends Component {
         this.setState({
             first_name: decoded.identity.first_name,
             last_name: decoded.identity.last_name,
-            email: decoded.identity.email
+            email: decoded.identity.email,
         })
         await axios.post('users/getAudioName/', {email: decoded.identity.email})
             .then(res => {
@@ -43,7 +46,8 @@ class UserProfile extends Component {
     onChange = (event) => {
         this.setState({
             file: event.target.files[0],
-            fileValue: event.target.files[0].name
+            fileValue: event.target.files[0].name,
+            hiddenFields: false
         })
     }
     handleAlertCanel = () => {
@@ -119,12 +123,39 @@ class UserProfile extends Component {
                     <MDBRow>
                         <MDBCol md="6">
                             <MDBRow>
-                                <Button onClick={this.handleFile} variant="outline-primary">Select Music</Button>
-                                <Input value={this.state.fileValue} />
+                                <MDBCard
+                                    className='card-image'
+                                    style={{
+                                        backgroundImage:
+                                        "url('https://mdbootstrap.com/img/Others/documentation/img%20(7)-mini.jpg')"
+                                    }}
+                                >
+                                <div className='text-white text-center d-flex align-items-center rgba-black-strong py-5 px-4'>
+                                    <div>
+                                    <h5 className='pink-text'>
+                                        <MDBIcon icon='headphones' /> Songs <MDBIcon icon='headphones' />
+                                    </h5>
+                                    <MDBCardTitle tag='h3' className='pt-2'>
+                                        <strong>Friend's Playlist <MDBIcon icon="record-vinyl" /></strong>
+                                    </MDBCardTitle>
+                                    <p>
+                                    Words make you think. Music makes you feel. A song makes you feel a thought.
+                                        Check what songs your friends are listening to !
+                                    </p>
+                                    <MDBBtn color='pink'>
+                                        <Link style={{ color: 'white' }} to="/friendfeed"> Check Out</Link>
+                                    </MDBBtn>
+                                    </div>
+                                </div>
+                                </MDBCard>
                             </MDBRow>
-                            <MDBRow className="container ml-auto pl-5">
+                            <MDBRow className="container mt-1">
+                                <Button className="mx-auto" onClick={this.handleFile} variant="outline-primary">Select Your Music<MDBIcon icon="music" className="ml-2" /></Button>
+                                <Input hidden={this.state.hiddenFields} value={this.state.fileValue} />
+                            </MDBRow>
+                            <MDBRow className="container">
                                 <input type="file" onChange={this.onChange} hidden id="music" name="audio_file" />
-                                <Button onClick={this.onSubmit} type="submit">Upload Music</Button>
+                                <Button hidden={this.state.hiddenFields}  className="mx-auto" onClick={this.onSubmit} type="submit">Upload<MDBIcon icon="upload" className="ml-2" /></Button>
                             </MDBRow>
                         </MDBCol>
                         <MDBCol md="6">

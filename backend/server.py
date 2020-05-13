@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, json, url_for, redirect
+from flask import Flask, jsonify, request, json
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
@@ -17,18 +17,13 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
 
-#currently not used anywhere
-@app.route('/users/getAudio/<email>', methods=['GET'])
-def showAudio(email):
-	user = mongo.db.audio.find_one_or_404({ 'email': email })
-	return mongo.send_file(user['audio_file_name'])
-
 @app.route('/users/register', methods=['POST'])
 def register():
 	users = mongo.db.users
 	first_name = request.get_json()['first_name']
 	last_name = request.get_json()['last_name']
 	email = request.get_json()['email']
+	friends = request.get_json()['friends']
 	password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
 	created = datetime.utcnow()
 	result = users.find_one({ 'email': email })
@@ -40,6 +35,7 @@ def register():
 			'last_name': last_name,
 			'email': email,
 			'password': password,
+			'friends': friends,
 			'created': created
 		})
 		return jsonify({ 'result': "User Registered", 'error': False })
@@ -55,7 +51,7 @@ def login():
 			access_token = create_access_token(identity = {
 				'first_name': response['first_name'],
 				'last_name': response['last_name'],
-				'email': response['email']
+				'email': response['email'],
 			})
 			return jsonify({ 'result': access_token, 'error': False })
 		else:
@@ -90,6 +86,28 @@ def showAudioName():
 		userStatus.append(doc['status'])
 	data['songName'] = user
 	data['songStatus'] = userStatus
+	return data
+
+@app.route('/users/getFriends/', methods=['POST'])
+def showFriends():
+	user = mongo.db.users.find_one({ 'email': request.get_json()['email'] })
+	data = dict()
+	data['friends'] = user['friends']
+	return data
+
+@app.route('/users/getAllUsers/', methods=['POST'])
+def getAllUsers():
+	users = list()
+	iterable = mongo.db.users.find()
+	data = dict()
+	for doc in iterable:
+		temp = dict()
+		temp['first_name'] = doc['first_name']
+		temp['last_name'] = doc['last_name']
+		temp['email'] = doc['email']
+		temp['friends'] = doc['friends']
+		users.append(temp)
+	data['users'] = users
 	return data
 
 @app.route('/users/updateStatus/', methods=['POST'])

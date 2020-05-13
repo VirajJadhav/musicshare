@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import {login} from "./Function"
+import { MDBContainer, MDBEdgeHeader, MDBFreeBird, MDBRow, MDBCol, MDBCardTitle, MDBInput, MDBBtn, MDBCardBody, MDBIcon } from "mdbreact"
 
 class Login extends Component {
     constructor(props) {
@@ -16,55 +17,45 @@ class Login extends Component {
     }
     onSubmit = (event) => {
         event.preventDefault();
-        const user = {
-            email: this.state.email,
-            password: this.state.password
+        if(this.state.email === "" || this.state.password === "") {
+            alert('Fields are empty !')
         }
-        login(user).then(response => {
-            if(response.error) {
-                alert(response.result)
+        else {
+            const user = {
+                email: this.state.email,
+                password: this.state.password
             }
-            else {
-                this.props.history.push('/profile')
-            }
-        })
+            login(user).then(response => {
+                if(response.error) {
+                    alert(response.result)
+                }
+                else {
+                    this.props.history.push('/profile')
+                }
+            })
+        }
     }
     render() {
         return (
-            <div className="container">
-                <div className="col-md-6 mt-5 mx-auto">
+            <MDBContainer className="mt-3">
+            <MDBEdgeHeader color="mdb-color" className=""></MDBEdgeHeader>
+            <MDBFreeBird>
+            <MDBRow>
+                <MDBCol md="8" lg="7" className="mx-auto float-none white z-depth-1 py-2 px-2">
+                <MDBCardBody>
+                    <MDBCardTitle className="text-center">Log In</MDBCardTitle>
                     <form noValidate onSubmit={this.onSubmit}>
-                        <h1 className="h3 mb-3 font-weight-normal">
-                            Please Sign In
-                        </h1>
-                        <div className="form-group">
-                            <label htmlFor="email">Email Address</label>
-                            <input
-                            type="email"
-                            className="form-control"
-                            name="email"
-                            placeholder="Enter Email"
-                            value={this.state.email}
-                            onChange={this.onchange}
-                            />
+                        <MDBInput label="Email" group type="email" icon="envelope" name="email" onChange={this.onchange} validate />
+                        <MDBInput label="Password" group type="password" name="password"  onChange={this.onchange} icon="lock" />
+                        <div className="text-center">
+                            <MDBBtn color="mdb-color" type="submit" className="text-xs-left">Submit <MDBIcon className="ml-2" icon="paper-plane" /></MDBBtn>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="email">Password</label>
-                            <input
-                            type="password"
-                            className="form-control"
-                            name="password"
-                            placeholder="Enter Password"
-                            value={this.state.password}
-                            onChange={this.onchange}
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-lg btn-primary btn-block">
-                            Sign In
-                        </button>
                     </form>
-                </div>
-            </div>
+                </MDBCardBody>
+                </MDBCol>
+            </MDBRow>
+            </MDBFreeBird>
+        </MDBContainer>
         )
     }
 }
