@@ -24,6 +24,8 @@ def register():
 	last_name = request.get_json()['last_name']
 	email = request.get_json()['email']
 	friends = request.get_json()['friends']
+	songs = request.get_json()['songs']
+	status = request.get_json()['status']
 	password = bcrypt.generate_password_hash(request.get_json()['password']).decode('utf-8')
 	created = datetime.utcnow()
 	result = users.find_one({ 'email': email })
@@ -36,6 +38,8 @@ def register():
 			'email': email,
 			'password': password,
 			'friends': friends,
+			'songs': songs,
+			'status': status,
 			'created': created
 		})
 		return jsonify({ 'result': "User Registered", 'error': False })
@@ -65,27 +69,52 @@ def upload():
 		audio_file = request.files['audio_file']
 		email = request.headers['email']
 		status = request.headers['status']
-		response = mongo.db.audio.find_one({ 'audio_file_name': audio_file.filename })
-		if(response):
+		user = mongo.db.users.find_one({ 'email': email })
+		newSongs = user['songs']
+		newStatus = user['status']
+		if audio_file.filename in newSongs:
 			return jsonify({ 'result': "Audio is already Present", 'error': True })
 		else:
+			newSongs.append(audio_file.filename)
+			newStatus.append(status)
 			mongo.save_file(audio_file.filename, audio_file)
-			mongo.db.audio.insert_one({ 'email': email, 'audio_file_name': audio_file.filename, 'status': status })
+			mongo.db.users.update_one({ 'email': email }, { '$set': { 'songs': newSongs, 'status': newStatus } })
 			return jsonify({ 'result': "Audio Saved", 'error': False })
 	else:
 		return jsonify({ 'result': "Failed to save Audio.", 'error': True })
 
+@app.route('/users/updateStatus/', methods=['POST'])
+def updateStatus():
+	email = request.get_json()['email']
+	index = request.get_json()['index']
+	status = request.get_json()['status']
+	user = mongo.db.users.find_one({ 'email': email })
+	newStatus = list(user['status'])
+	if(status == "Private"):
+		newStatus[index] = "Public"
+		mongo.db.users.update_one({ 'email': email }, { '$set': { 'status': newStatus }})
+		return jsonify({ 'result': True, "value": "Public" })
+	elif(status == "Public"): 
+		newStatus[index] = "Private"
+		mongo.db.users.update_one({ 'email': email }, { '$set': { 'status': newStatus }})
+		return jsonify({ 'result': True, "value": "Private" })
+
+@app.route('/users/getAllAudio/<email>/<name>')
+def show(email, name):
+	user = mongo.db.users.find_one({ 'email': email })
+	for doc in user['songs']:
+		if name == doc:
+			return mongo.send_file(name)
+	return ""
+
 @app.route('/users/getAudioName/', methods=['POST'])
 def showAudioName():
-	user = list()
-	userStatus = list()
 	data = dict()
-	iterable = mongo.db.audio.find({ 'email': request.get_json()['email'] })
-	for doc in iterable:
-		user.append(doc['audio_file_name'])
-		userStatus.append(doc['status'])
-	data['songName'] = user
-	data['songStatus'] = userStatus
+	userSongs = list()
+	userStatus = list()
+	user = mongo.db.users.find_one({ 'email': request.get_json()['email'] })
+	data['songName'] = user['songs']
+	data['songStatus'] = user['status']
 	return data
 
 @app.route('/users/getFriends/', methods=['POST'])
@@ -99,39 +128,43 @@ def showFriends():
 def getAllUsers():
 	users = list()
 	iterable = mongo.db.users.find()
+	email = request.get_json()['email']
 	data = dict()
 	for doc in iterable:
-		temp = dict()
-		temp['first_name'] = doc['first_name']
-		temp['last_name'] = doc['last_name']
-		temp['email'] = doc['email']
-		temp['friends'] = doc['friends']
-		users.append(temp)
+		if email != doc['email']:
+			temp = dict()
+			temp['first_name'] = doc['first_name']
+			temp['last_name'] = doc['last_name']
+			temp['email'] = doc['email']
+			temp['friends'] = doc['friends']
+			users.append(temp)
 	data['users'] = users
 	return data
 
-@app.route('/users/updateStatus/', methods=['POST'])
-def updateStatus():
-	email = request.get_json()['email']
-	name = request.get_json()['name']
-	status = request.get_json()['status']
-	user = {}
-	if(status == "Private"):
-		user = { 'email': email, 'audio_file_name': name, 'status': status }
-		mongo.db.audio.update_one(user, { '$set': { 'email': email, 'audio_file_name': name, 'status': "Public" }})
-		return jsonify({ 'result': True, "value": "Public" })
-	elif(status == "Public"): 
-		user = { 'email': email, 'audio_file_name': name, 'status': status }
-		mongo.db.audio.update_one(user, { '$set': { 'email': email, 'audio_file_name': name, 'status': "Private" }})
-		return jsonify({ 'result': True, "value": "Private" })
+@app.route('/users/addFriend/', methods=['POST'])
+def addFriend():
+	tempFriends = []
+	user = mongo.db.users.find_one({ 'email': request.get_json()['email'] })
+	tempFriends = user['friends']
+	tempFriends.append(request.get_json()['friendEmail'])
+	mongo.db.users.update_one({ 'email': user['email'] }, { '$set': { 'friends': tempFriends } })
+	return jsonify({ 'result': "Added as friend", 'error': False })
 
-@app.route('/users/getAllAudio/<email>/<name>')
-def show(email, name):
-	iterable = mongo.db.audio.find({ 'email': email })
-	for doc in iterable:
-		if name == doc['audio_file_name']:
-			return mongo.send_file(name)
-	return ""
+@app.route('/users/getFriendsData/', methods=['POST'])
+def getFriendsData():
+	data = dict()
+	requested = mongo.db.users.find_one({ 'email': request.get_json()['email'] })
+	friends = requested['friends']
+	index = 1
+	if(len(friends) > 0):
+		for doc in friends:
+			user = mongo.db.users.find_one({ 'email': doc })
+			del user['_id']
+			del user['created']
+			del user['password']
+			data['friend' + str(index)] = user
+			index += 1
+	return data
 
 if __name__ == "__main__":
 	app.run(debug=True)

@@ -67,7 +67,7 @@ export default function ListComponent(props) {
                 <CardComponent index={index} email={props.email} songName={props.songName} />
             </ExpansionPanelDetails>
             <div className="text-center mb-2">
-              <RadioComponent history={props.history} email={props.email} songName={props.songName[index]} songStatus={props.songStatus[index++]} />
+              <RadioComponent history={props.history} index={index} email={props.email} songStatus={props.songStatus[index++]} />
             </div>
         </ExpansionPanel>
   )

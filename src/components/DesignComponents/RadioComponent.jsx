@@ -30,8 +30,8 @@ export default function RadioComponent(props) {
   const handleChange = (event) => {
     const User = {
         email: props.email,
-        name: props.songName,
         status: props.songStatus,
+        index: props.index,
     }
     updateStatus(User).then(response => {
       if(response.result) {

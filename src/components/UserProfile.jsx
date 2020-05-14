@@ -19,7 +19,6 @@ class UserProfile extends Component {
             first_name: "",
             last_name: "",
             email: "",
-            friends: [],
             file: null,
             songName: [],
             songStatus: [],
@@ -142,9 +141,11 @@ class UserProfile extends Component {
                                     Words make you think. Music makes you feel. A song makes you feel a thought.
                                         Check what songs your friends are listening to !
                                     </p>
-                                    <MDBBtn color='pink'>
-                                        <Link style={{ color: 'white' }} to="/friendfeed"> Check Out</Link>
-                                    </MDBBtn>
+                                    <Link style={{ color: 'white' }} to="/friendfeed">
+                                        <MDBBtn color='pink'>
+                                            Check Out
+                                        </MDBBtn>
+                                    </Link>
                                     </div>
                                 </div>
                                 </MDBCard>
@@ -161,10 +162,10 @@ class UserProfile extends Component {
                         <MDBCol md="6">
                             <MDBCol className="d-flex justify-content-between" md="12">
                                 <Button onClick={() => this.showStatusList('Private Songs')} variant="info">Private Songs</Button>
+                                {/* <Button size="sm" variant="outline-danger">Delete Song</Button> */}
                                 <Button onClick={() => this.showStatusList('Public Songs')} variant="secondary">Public Songs</Button>
                             </MDBCol>
                             <ListComponent history={this.props.history} email={this.state.email} songName={this.state.songName} songStatus={this.state.songStatus} />
-                        <div className="gcse-search"></div>
                         </MDBCol>
                     </MDBRow>
                 </MDBContainer>
