@@ -49,3 +49,19 @@ export const updateStatus = (User) => {
     })
     .catch(error => console.log(error.message))
 }
+
+export const deleteSong = (User) => {
+    return axios.post('users/deleteSong/', User)
+    .then(response => {
+        return response.data
+    })
+    .catch(error => console.log(error.message))
+}
+
+export const removeFriend = (User) => {
+    return axios.post('users/deleteFriend/', User)
+        .then(response => {
+            return response.data
+        })
+        .catch(error => console.log(error.message))
+}

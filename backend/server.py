@@ -166,5 +166,28 @@ def getFriendsData():
 			index += 1
 	return data
 
+@app.route('/users/deleteSong/', methods=['POST'])
+def deleteSong():
+	email = request.get_json()['email']
+	songName = request.get_json()['songName']
+	user = mongo.db.users.find_one({ 'email': email })
+	songs = user['songs']
+	index = songs.index(songName)
+	status = user['status']
+	songs.remove(songName)
+	del status[index]
+	mongo.db.users.update_one({ 'email': email }, { '$set': { 'songs': songs, 'status': status } })
+	return jsonify({ 'result': 'Song deleted !', 'error': False })
+
+@app.route('/users/deleteFriend/', methods=['POST'])
+def removeFriend():
+	email = request.get_json()['email']
+	friend_email = request.get_json()['deleteFriend']
+	user = mongo.db.users.find_one({ 'email': email })
+	friends = user['friends']
+	friends.remove(friend_email)
+	mongo.db.users.update_one({ 'email': email }, { '$set': { 'friends': friends } })
+	return jsonify({ 'result': 'Friend Removed', 'error': False })
+
 if __name__ == "__main__":
 	app.run(debug=True)

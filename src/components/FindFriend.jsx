@@ -25,35 +25,40 @@ class FindFriend extends Component {
         }
     }
     async componentDidMount() {
-        const decoded = jwt_decode(localStorage.usertoken)
-        await axios.post('users/getAllUsers/', { 'email': decoded.identity.email })
-            .then(response => {
-                axios.post('users/getFriends/', {'email': decoded.identity.email })
-                    .then(res => {
-                        const users = response.data.users;
-                        const userFriends = res.data.friends;
-                        if(userFriends.length > 0) {
-                            for(let i = 0; i < userFriends.length; i++) {
-                                for(let j = 0; j < users.length; j++) {
-                                    if(userFriends[i] === users[j].email) {
-                                        users.splice(j, 1)
+        if(localStorage.usertoken) {
+            const decoded = jwt_decode(localStorage.usertoken)
+            await axios.post('users/getAllUsers/', { 'email': decoded.identity.email })
+                .then(response => {
+                    axios.post('users/getFriends/', {'email': decoded.identity.email })
+                        .then(res => {
+                            const users = response.data.users;
+                            const userFriends = res.data.friends;
+                            if(userFriends.length > 0) {
+                                for(let i = 0; i < userFriends.length; i++) {
+                                    for(let j = 0; j < users.length; j++) {
+                                        if(userFriends[i] === users[j].email) {
+                                            users.splice(j, 1)
+                                        }
                                     }
                                 }
+                                this.setState({
+                                    data: users,
+                                    friends: userFriends
+                                })
                             }
-                            this.setState({
-                                data: users,
-                                friends: userFriends
-                            })
-                        }
-                        else {
-                            this.setState({
-                                data: users
-                            })
-                        }
-                    })
-                    .catch(error => console.log(error.message))
-            })
-            .catch(error => console.log(error.message))
+                            else {
+                                this.setState({
+                                    data: users
+                                })
+                            }
+                        })
+                        .catch(error => console.log(error.message))
+                })
+                .catch(error => console.log(error.message))
+        }
+        else {
+            this.props.history.push('/')
+        }
     }
     handleAlertCanel = () => {
         this.setState({

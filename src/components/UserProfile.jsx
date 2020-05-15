@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import jwt_decode from "jwt-decode"
-import {upload} from "./Function.js"
+import {upload, deleteSong} from "./Function.js"
 import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBIcon, MDBBtn, MDBCardTitle } from "mdbreact"
 import ListComponent from "./DesignComponents/ListComponent"
 import axios from "axios"
-import { Button } from "react-bootstrap"
+import { Button, Form } from "react-bootstrap"
 import { Input } from '@material-ui/core'
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Link } from 'react-router-dom'
@@ -14,6 +14,8 @@ class UserProfile extends Component {
         super(props);
         this.state = {
             open: false,
+            deleteOpen: false,
+            deleteSong: "",
             alertValue: "",
             alertTitle: "",
             first_name: "",
@@ -27,27 +29,77 @@ class UserProfile extends Component {
 	    }
     }
     async componentDidMount() {
-        const decoded = jwt_decode(localStorage.usertoken)
-        this.setState({
-            first_name: decoded.identity.first_name,
-            last_name: decoded.identity.last_name,
-            email: decoded.identity.email,
-        })
-        await axios.post('users/getAudioName/', {email: decoded.identity.email})
-            .then(res => {
-                this.setState({
-                    songName: res.data.songName,
-                    songStatus: res.data.songStatus
-                })
+        if(localStorage.usertoken) {
+            const decoded = jwt_decode(localStorage.usertoken)
+            this.setState({
+                first_name: decoded.identity.first_name,
+                last_name: decoded.identity.last_name,
+                email: decoded.identity.email,
             })
-            .catch(error => console.log(error.message))
+            await axios.post('users/getAudioName/', {email: decoded.identity.email})
+                .then(res => {
+                    this.setState({
+                        songName: res.data.songName,
+                        songStatus: res.data.songStatus
+                    })
+                })
+                .catch(error => console.log(error.message))
+        }
+        else {
+            this.props.history.push('/')
+        }
     }
     onChange = (event) => {
         this.setState({
             file: event.target.files[0],
             fileValue: event.target.files[0].name,
-            hiddenFields: false
+            hiddenFields: false,
         })
+    }
+    onChangeSelect = (event) => {
+        this.setState({
+            deleteSong: event.target.value
+        })
+    }
+    showSelectDelete = () => {
+        return (
+            <Form>
+                <Form.Group controlId="deleteSongs">
+                    <Form.Control as="select" onChange={this.onChangeSelect} size="lg" custom>
+                        <option value="disabled">Choose a Song</option>
+                        {this.state.songName.map((songs, index) => {
+                            return (
+                                <option key={index} value={songs}>{songs}</option>
+                            )
+                        })}
+                    </Form.Control>
+                </Form.Group>
+            </Form>
+        )
+    }
+    handleDeleteCancel = () => {
+        this.setState({
+            deleteOpen: false
+        })
+    }
+    handleDelete = () => {
+        this.setState({
+            deleteOpen: true
+        })
+    }
+    deleteSong = () => {
+        if(this.state.deleteSong !== "") {
+            const User = { email: this.state.email, songName: this.state.deleteSong }
+            deleteSong(User).then(response => {
+                if(!response.error) {
+                    window.location.reload()
+                }
+            })
+            .catch(error => console.log(error.message))
+        }
+        else {
+            alert('Please Select a song')
+        }
     }
     handleAlertCanel = () => {
         this.setState({
@@ -111,13 +163,33 @@ class UserProfile extends Component {
                     >
                         {this.state.alertValue}
                     </SweetAlert>
+                    <SweetAlert
+                        show={this.state.deleteOpen}
+                        title="Select Song"
+                        onConfirm={this.handleDeleteCancel}
+                        customButtons={
+                            <React.Fragment>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => {
+                                        this.deleteSong();                 
+                                        this.handleDeleteCancel();
+                                    }}
+                                >
+                                    Delete
+                                </Button>
+                                <Button variant="dark" onClick={this.handleDeleteCancel}>Cancel</Button>
+                            </React.Fragment>
+                        }
+                    >
+                     {this.showSelectDelete()}
+                    </SweetAlert>
                 </div>
                 <div className="mt-4">
                 <h1 className="text-center">
                     Welcome,
     {" " + this.state.first_name}
                 </h1>
-                {/* <h1>Your Songs</h1> */}
                 <MDBContainer >
                     <MDBRow>
                         <MDBCol md="6">
@@ -162,7 +234,7 @@ class UserProfile extends Component {
                         <MDBCol md="6">
                             <MDBCol className="d-flex justify-content-between" md="12">
                                 <Button onClick={() => this.showStatusList('Private Songs')} variant="info">Private Songs</Button>
-                                {/* <Button size="sm" variant="outline-danger">Delete Song</Button> */}
+                                <Button size="sm" onClick={this.handleDelete} variant="outline-danger">Delete Song</Button>
                                 <Button onClick={() => this.showStatusList('Public Songs')} variant="secondary">Public Songs</Button>
                             </MDBCol>
                             <ListComponent history={this.props.history} email={this.state.email} songName={this.state.songName} songStatus={this.state.songStatus} />

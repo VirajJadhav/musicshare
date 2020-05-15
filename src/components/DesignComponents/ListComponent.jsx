@@ -58,10 +58,10 @@ export default function ListComponent(props) {
     setExpanded(newExpanded ? panel : false);
   };
 
-  const showSongs = () => (
+  const showSongs = (songName) => (
           <ExpansionPanel style={{ backgroundColor: '#3b4d61', color: 'white' }} key={index} TransitionProps={{ unmountOnExit: true }} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon color="error" fontSize="large" />} aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
-  <Typography>{props.songName[index]}</Typography>
+  <Typography>{songName}</Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails style={{ backgroundColor: '#ced7d8' }} className="d-flex justify-content-center">
                 <CardComponent index={index} email={props.email} songName={props.songName} />
@@ -73,7 +73,7 @@ export default function ListComponent(props) {
   )
   return (
     <div className="mb-4">
-        {props.songName.map(() => showSongs())}
+        {props.songName.map((songName) => showSongs(songName))}
     </div>
   );
 }
