@@ -4,7 +4,8 @@ import {upload, deleteSong} from "./Function.js"
 import { MDBCol, MDBContainer, MDBRow, MDBCard, MDBIcon, MDBBtn, MDBCardTitle } from "mdbreact"
 import ListComponent from "./DesignComponents/ListComponent"
 import axios from "axios"
-import { Button, Form } from "react-bootstrap"
+import { ReactMic } from 'react-mic';
+import { Button, Form, Spinner } from "react-bootstrap"
 import { Input } from '@material-ui/core'
 import SweetAlert from "react-bootstrap-sweetalert";
 import { Link } from 'react-router-dom'
@@ -26,6 +27,10 @@ class UserProfile extends Component {
             songStatus: [],
             fileValue: "",
             hiddenFields: true,
+            record: false,
+            showControls: true,
+            controlButtons: false,
+            loading: true,
 	    }
     }
     async componentDidMount() {
@@ -40,7 +45,8 @@ class UserProfile extends Component {
                 .then(res => {
                     this.setState({
                         songName: res.data.songName,
-                        songStatus: res.data.songStatus
+                        songStatus: res.data.songStatus,
+                        loading: false,
                     })
                 })
                 .catch(error => console.log(error.message))
@@ -48,6 +54,48 @@ class UserProfile extends Component {
         else {
             this.props.history.push('/')
         }
+    }
+    startRecording = () => {
+        alert('Your Recording will Start Now. Click Ok !')
+        this.setState({
+            controlButtons: true,
+            record: true
+        })
+    }
+    stopRecording = () => {
+        this.setState({
+            record: false,
+            controlButtons: false,
+        });
+    }
+    onStop(recordedBlob) {
+        recordedBlob.blob['contentType'] = "audio/mp3"
+        console.log('recordedBlob is: ', recordedBlob);
+        const formData = new FormData()
+        formData.append('audio_file', recordedBlob.blob)
+        const decoded = jwt_decode(localStorage.usertoken)
+        const User = { email: decoded.identity.email, audio_file: formData, status: "Private" }
+        upload(User).then(res => {
+            if(!res.error) {
+                window.location.reload();
+            }
+            else if(res.error) {
+                alert(res.result)
+            }
+        })
+        .catch(error => console.log(error.messgae))
+    }
+    handleRecording = () => {
+        this.setState({
+            showControls: false,
+        })
+    }
+    handleRecordingCancel = () => {
+        this.setState({
+            record: false,
+            showControls: true,
+            controlButtons: false,
+        })
     }
     onChange = (event) => {
         this.setState({
@@ -222,13 +270,19 @@ class UserProfile extends Component {
                                 </div>
                                 </MDBCard>
                             </MDBRow>
-                            <MDBRow className="container mt-1">
-                                <Button className="mx-auto" onClick={this.handleFile} variant="outline-primary">Select Your Music<MDBIcon icon="music" className="ml-2" /></Button>
+                            <MDBRow className="container mt-1 d-flex justify-content-center">
+                                <Button style={{ marginLeft: '2rem' }} disabled={!this.state.showControls} onClick={this.handleFile} variant="outline-primary">Select Your Music<MDBIcon icon="music" className="ml-2" /></Button>
                                 <Input hidden={this.state.hiddenFields} value={this.state.fileValue} />
                             </MDBRow>
                             <MDBRow className="container">
                                 <input type="file" onChange={this.onChange} hidden id="music" name="audio_file" />
-                                <Button hidden={this.state.hiddenFields}  className="mx-auto" onClick={this.onSubmit} type="submit">Upload<MDBIcon icon="upload" className="ml-2" /></Button>
+                                <Button hidden={this.state.hiddenFields} disabled={!this.state.showControls}  className="mx-auto" onClick={this.onSubmit} type="submit">Upload<MDBIcon icon="upload" className="ml-2" /></Button>
+                            </MDBRow>
+                            <MDBRow className="d-flex justify-content-center">
+                                <Button variant="outline-danger" hidden={this.state.showControls} disabled={this.state.controlButtons} onClick={this.startRecording} type="button">Start</Button>
+                                <Button onClick={this.handleRecording} hidden variant="danger" type="button">Record Your Music<MDBIcon className="ml-2" icon='microphone-alt' /></Button>
+                                <Button variant="secondary" hidden={this.state.showControls} disabled={!this.state.controlButtons} onClick={this.stopRecording} type="button">Stop</Button>
+                                <Button variant="outline-dark" hidden={this.state.showControls} disabled={this.state.controlButtons} onClick={this.handleRecordingCancel} type="button">Cancel</Button>
                             </MDBRow>
                         </MDBCol>
                         <MDBCol md="6">
@@ -237,10 +291,23 @@ class UserProfile extends Component {
                                 <Button size="sm" onClick={this.handleDelete} variant="outline-danger">Delete Song</Button>
                                 <Button onClick={() => this.showStatusList('Public Songs')} variant="secondary">Public Songs</Button>
                             </MDBCol>
-                            <ListComponent history={this.props.history} email={this.state.email} songName={this.state.songName} songStatus={this.state.songStatus} />
+                            {this.state.loading && <div className="d-flex justify-content-center mt-4"><Spinner animation="border" /></div>}
+                            {!this.state.loading && <ListComponent history={this.props.history} email={this.state.email} songName={this.state.songName} songStatus={this.state.songStatus} />}
                         </MDBCol>
                     </MDBRow>
                 </MDBContainer>
+                </div>
+                <div style={{ display: "none" }}>
+                    <ReactMic
+                        record={this.state.record}
+                        className="sound-wave"
+                        visualSetting="frequencyBars"
+                        onStop={this.onStop}
+                        onBlock={() => alert('Could not record audio !')}
+                        strokeColor="#000000"
+                        mimeType="audio/mp3"
+                        backgroundColor="#FF4081" 
+                    />
                 </div>
             </div>
         )

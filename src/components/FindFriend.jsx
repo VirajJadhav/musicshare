@@ -5,7 +5,7 @@ import Checkbox from "@material-ui/core/Checkbox"
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import TextField from '@material-ui/core/TextField';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import { Button, ListGroup, Col } from "react-bootstrap"
+import { Button, ListGroup, Col, Spinner } from "react-bootstrap"
 import SweetAlert from "react-bootstrap-sweetalert";
 import axios from "axios"
 
@@ -22,6 +22,8 @@ class FindFriend extends Component {
             data: [],
             friends: [],
             users: "",
+            record: false,
+            loading: true,
         }
     }
     async componentDidMount() {
@@ -43,12 +45,14 @@ class FindFriend extends Component {
                                 }
                                 this.setState({
                                     data: users,
-                                    friends: userFriends
+                                    friends: userFriends,
+                                    loading: false,
                                 })
                             }
                             else {
                                 this.setState({
-                                    data: users
+                                    data: users,
+                                    loading: false,
                                 })
                             }
                         })
@@ -66,7 +70,7 @@ class FindFriend extends Component {
         })
     }
     handleAlert = () => {
-        if(this.state.users !== "") {
+        if(this.state.users !== "" && this.state.users !== null) {
             this.setState({
                 open: true,
                 alertName: this.state.users.first_name + " " + this.state.users.last_name,
@@ -159,11 +163,12 @@ class FindFriend extends Component {
                         <Button variant="primary" size="sm" className="ml-2" onClick={this.handleAlert}>Follow Friend</Button>
                 </div>
                 <div className="d-flex justify-content-center mt-3">
-                    <Col md="6">
+                {this.state.loading && <div><Spinner animation="border" /></div>}
+                {!this.state.loading && <Col md="6">
                         <ListGroup as="ul">
                             {this.returnUsers()}
                         </ListGroup>
-                    </Col>
+                    </Col>}
                 </div>
             </div>
         )

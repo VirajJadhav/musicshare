@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import jwt_decode from "jwt-decode"
 import { removeFriend } from "./Function"
 import DefaultList from "./DesignComponents/DefaultList"
-import { Button, Form } from "react-bootstrap"
+import { Button, Form, Spinner } from "react-bootstrap"
 import SweetAlert from "react-bootstrap-sweetalert";
 import axios from "axios"
 
@@ -13,7 +13,7 @@ class FriendFeed extends Component {
             email: "",
             friends: {},
             data: [],
-            loading: false,
+            loading: true,
             deleteOpen: false,
             deleteFriend: "",
         }
@@ -31,7 +31,7 @@ class FriendFeed extends Component {
                         email: decoded.identity.email,
                         data,
                         friends: response.data,
-                        loading: true
+                        loading: false
                     })
                 })
                 .catch(error => console.log(error.message))
@@ -103,7 +103,7 @@ class FriendFeed extends Component {
                                     this.handleDeleteCancel();
                                 }}
                             >
-                                Delete
+                                Remove
                             </Button>
                             <Button variant="dark" onClick={this.handleDeleteCancel}>Cancel</Button>
                         </React.Fragment>
@@ -117,7 +117,8 @@ class FriendFeed extends Component {
                         <div className="d-flex justify-content-center mb-2">
                             <Button onClick={this.handleDelete} variant="outline-danger">Remove Friend</Button>
                         </div>
-                        {this.state.loading && <DefaultList friends={this.state.data} />}
+                        {this.state.loading && <div className="d-flex justify-content-center mt-4"><Spinner animation="border" /></div>}
+                        {!this.state.loading && <DefaultList friends={this.state.data} />}
                     </div>
                 </div>
             </div>

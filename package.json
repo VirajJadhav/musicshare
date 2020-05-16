@@ -21,10 +21,12 @@
     "react-bootstrap": "^1.0.1",
     "react-bootstrap-sweetalert": "^5.1.9",
     "react-dom": "^16.13.1",
+    "react-mic": "^12.4.6",
     "react-music": "^1.0.3",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1",
-    "react-sound": "^1.2.0"
+    "react-sound": "^1.2.0",
+    "youtube-api-search": "0.0.5"
   },
   "scripts": {
     "start": "react-scripts start",
