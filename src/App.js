@@ -6,6 +6,9 @@ import Landing from "./components/Landing"
 import Register from "./components/Register"
 import FriendFeed from "./components/FriendFeed"
 import FindFriend from "./components/FindFriend"
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
+import DeleteProfile from "./components/DeleteProfile"
 import Login from "./components/Login"
 import './App.css';
 
@@ -18,9 +21,12 @@ function App() {
             <Route exact path="/" component={Landing} />
             <Route exact path="/login" component={Login} />
             <Route exact path="/register" component={Register} />
+            <Route exact path="/forgotPassword" component={ForgotPassword} />
+            <Route exact path="/resetPassword" component={ResetPassword} />
             <Route exact path="/profile" component={UserProfile} />
             <Route exact path="/friendfeed" component={FriendFeed} />
             <Route exact path="/findfriend" component={FindFriend} />
+            <Route exact path="/deleteProfile" component={DeleteProfile} />
           </Switch>
         </div>
     </Router>

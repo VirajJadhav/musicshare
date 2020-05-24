@@ -31,12 +31,14 @@ class Register extends Component {
                 password
             }
             register(user).then(response => {
-                if(response.error) {
-                    alert(response.result)
-                }
-                else {
-                    alert(response.result)
-                    this.props.history.push('/login')
+                if(response !== undefined) {
+                    if(response.error) {
+                        alert(response.result)
+                    }
+                    else {
+                        alert(response.result)
+                        this.props.history.push('/login')
+                    }
                 }
             })
         }

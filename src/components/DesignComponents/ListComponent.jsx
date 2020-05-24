@@ -59,7 +59,7 @@ export default function ListComponent(props) {
   };
 
   const showSongs = (songName) => (
-          <ExpansionPanel style={{ backgroundColor: '#3b4d61', color: 'white' }} key={index} TransitionProps={{ unmountOnExit: true }} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
+          <ExpansionPanel style={{ backgroundColor: '#3b4d61', color: 'white' }} key={index} square expanded={expanded === 'panel' + index} onChange={handleChange('panel' + index)}>
             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon color="error" fontSize="large" />} aria-controls={"panel" + index + "d-content"} id={"panel" + index + "d-header"}>
   <Typography>{songName}</Typography>
             </ExpansionPanelSummary>

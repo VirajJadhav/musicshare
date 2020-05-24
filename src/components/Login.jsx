@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {login} from "./Function"
 import { MDBContainer, MDBEdgeHeader, MDBFreeBird, MDBRow, MDBCol, MDBCardTitle, MDBInput, MDBBtn, MDBCardBody, MDBIcon } from "mdbreact"
+import { Link } from 'react-router-dom';
 
 class Login extends Component {
     constructor(props) {
@@ -49,6 +50,7 @@ class Login extends Component {
                         <MDBInput label="Password" group type="password" name="password"  onChange={this.onchange} icon="lock" />
                         <div className="text-center">
                             <MDBBtn color="mdb-color" type="submit" className="text-xs-left">Submit <MDBIcon className="ml-2" icon="paper-plane" /></MDBBtn>
+                            <p className="mt-2"><Link style={{ fontSize: '1.3rem' }} to="/forgotPassword">Forgot Password ?</Link></p>
                         </div>
                     </form>
                 </MDBCardBody>

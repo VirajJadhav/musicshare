@@ -71,6 +71,7 @@ class UserProfile extends Component {
     onStop(recordedBlob) {
         recordedBlob.blob['contentType'] = "audio/mp3"
         console.log('recordedBlob is: ', recordedBlob);
+        const url = URL.createObjectURL(recordedBlob.blob)
         const formData = new FormData()
         formData.append('audio_file', recordedBlob.blob)
         const decoded = jwt_decode(localStorage.usertoken)
@@ -280,7 +281,7 @@ class UserProfile extends Component {
                             </MDBRow>
                             <MDBRow className="d-flex justify-content-center">
                                 <Button variant="outline-danger" hidden={this.state.showControls} disabled={this.state.controlButtons} onClick={this.startRecording} type="button">Start</Button>
-                                <Button onClick={this.handleRecording} hidden variant="danger" type="button">Record Your Music<MDBIcon className="ml-2" icon='microphone-alt' /></Button>
+                                {/* <Button onClick={this.handleRecording} hidden={!this.state.showControls} variant="danger" type="button">Record Your Music<MDBIcon className="ml-2" icon='microphone-alt' /></Button> */}
                                 <Button variant="secondary" hidden={this.state.showControls} disabled={!this.state.controlButtons} onClick={this.stopRecording} type="button">Stop</Button>
                                 <Button variant="outline-dark" hidden={this.state.showControls} disabled={this.state.controlButtons} onClick={this.handleRecordingCancel} type="button">Cancel</Button>
                             </MDBRow>

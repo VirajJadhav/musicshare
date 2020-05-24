@@ -1,12 +1,20 @@
-from flask import Flask, jsonify, request, json
+from flask import Flask, jsonify, request, json, redirect
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
+
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'acceptmail.23@gmail.com'
+app.config['MAIL_PASSWORD'] = 'mrtdrojaylmagthv'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
 app.config['MONGO_DBNAME'] = "musicshare"
 app.config['MONGO_URI'] = "mongodb://localhost:27017/musicshare"
@@ -16,6 +24,7 @@ mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 CORS(app)
+mail = Mail(app)
 
 @app.route('/users/register', methods=['POST'])
 def register():
@@ -188,6 +197,33 @@ def removeFriend():
 	friends.remove(friend_email)
 	mongo.db.users.update_one({ 'email': email }, { '$set': { 'friends': friends } })
 	return jsonify({ 'result': 'Friend Removed', 'error': False })
+
+@app.route('/users/resetRedirect/', methods=['POST'])
+def reset_redirect():
+	email = request.get_json()['email']
+	password = request.get_json()['password']
+	print(email, password)
+	user = mongo.db.users.find_one({ 'email': email })
+	if(user):
+		password = bcrypt.generate_password_hash(password).decode('utf-8')
+		mongo.db.users.update_one({ 'email': email }, { '$set': { 'password': password } })
+		return jsonify({ 'result': "Password Changed", 'error': False })
+	else:
+		return jsonify({ 'result': 'Email Not Registered', 'error': False })
+
+@app.route('/users/sendMail/', methods=['POST'])
+def sendMail():
+	email = request.get_json()['email']
+	msg = Message('Password Reset', sender = 'acceptmail.23@gmail.com', recipients=[email])
+	msg.body = "This is a password reset mail"
+	msg.html = "<a href=\"http://localhost:3000/resetPassword\">Click here to reset password</a>"
+	mail.send(msg)
+	return jsonify({ 'result': "Mail Sent !", 'error': False })
+
+@app.route('/users/deleteAccount/', methods=['POST'])
+def deleteAcc():
+	email = request.get_json()['email']
+	return jsonify({ 'result': "Your Account is deleted !", 'error': False })
 
 if __name__ == "__main__":
 	app.run(debug=True)
