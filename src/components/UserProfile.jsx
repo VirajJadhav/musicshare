@@ -71,7 +71,6 @@ class UserProfile extends Component {
     onStop(recordedBlob) {
         recordedBlob.blob['contentType'] = "audio/mp3"
         console.log('recordedBlob is: ', recordedBlob);
-        const url = URL.createObjectURL(recordedBlob.blob)
         const formData = new FormData()
         formData.append('audio_file', recordedBlob.blob)
         const decoded = jwt_decode(localStorage.usertoken)
