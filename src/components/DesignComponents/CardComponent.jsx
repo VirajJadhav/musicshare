@@ -1,6 +1,6 @@
 import React from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Card, CardContent, CardMedia, IconButton, Typography } from "@material-ui/core"
+import { makeStyles } from '@material-ui/core/styles';
+import { Card, CardContent, CardMedia, Typography } from "@material-ui/core"
 // import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 // import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 // import SkipNextIcon from '@material-ui/icons/SkipNext';
@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function CardComponent(props) {
   const classes = useStyles();
-  const theme = useTheme();
+  // const theme = useTheme();
   const url = '/users/getAllAudio/' + props.email + "/" + props.songName[props.index]
   return (
     <Card className={classes.root}>
