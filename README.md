@@ -3,6 +3,7 @@
 
 ## To run the project:
   1. Start the backend which is in virtual environment :
+ 
     a. cd into backend folder
     If requirements of dependencies not statisfied:
       a. You can install them using pip or conda - pip install <package-name>
@@ -11,6 +12,7 @@
       b. Now your backend will be up and running.
   
   2. Start the frontend:
+ 
     run following commands on command line:
       a. npm install -> doing this will install all the necessary dependencies used in the project
       b. npm start -> this will start frontend server (if not prompted go to http://localhost:3000 on your browser
